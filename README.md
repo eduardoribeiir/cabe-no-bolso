@@ -12,7 +12,8 @@ Aplicação Java com interface gráfica Swing para planejar despesas de um passe
 > 4. MARIA EDUARDA BESSA BRAZ – matrícula
 > 5. NINA RAFAELA ARAUJO DA SILVA – matrícula
 > 6. RISOLETA PEREIRA PINTO – matrícula
-> **Repositório GitHub:** preencher com a URL após publicar e liberar acesso para correção
+
+> **Repositório GitHub:** (https://github.com/eduardoribeiir/cabe-no-bolso)
 
 ## Requisitos
 
