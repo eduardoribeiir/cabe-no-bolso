@@ -1,11 +1,11 @@
-
 package cabenobolso.modelo;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.ArrayList;
-import java.util.Comparator;
 
 import cabenobolso.excecao.DadosInvalidosException;
 
@@ -16,8 +16,18 @@ public class DespesaFixa extends Despesa {
     public DespesaFixa(String descricao, long valor,
                        List<Participante> participantes)
                        throws DadosInvalidosException {
-
         super(descricao, valor, participantes);
+    }
+
+    public DespesaFixa(String descricao, BigDecimal valorReais,
+                       List<Participante> participantes)
+                       throws DadosInvalidosException {
+        super(descricao, valorReais, participantes);
+    }
+
+    @Override
+    public String getTipo() {
+        return "Fixa";
     }
 
     @Override
@@ -32,10 +42,11 @@ public class DespesaFixa extends Despesa {
             Comparator.comparingInt(Participante::getCodigo)
         );
 
-        long valorBase = getValor() / selecionados.size();
-        long centavosRestantes = getValor() % selecionados.size();
+        int quantidade = selecionados.size();
+        long valorBase = getValor() / quantidade;
+        long centavosRestantes = getValor() % quantidade;
 
-        for (int i = 0; i < selecionados.size(); i++) {
+        for (int i = 0; i < quantidade; i++) {
 
             Participante participante = selecionados.get(i);
 
@@ -53,5 +64,9 @@ public class DespesaFixa extends Despesa {
 
         return resultado;
     }
-}
 
+    @Override
+    public long calcularCustoTotal() {
+        return getValor();
+    }
+}
