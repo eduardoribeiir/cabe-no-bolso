@@ -47,4 +47,62 @@ public class Planejamento implements Serializable {
         despesas.remove(despesa);
     }
 }
+ 
+import java.util.Map;
+import java.util.HashMap;
+
+public long calcularTotalParticipante(int codigo) {
+
+    long total = 0;
+
+    for (Despesa despesa : despesas) {
+
+        Map<Integer, Long> rateio =
+            despesa.calcularRateio();
+
+        total += rateio.getOrDefault(codigo, 0L);
+    }
+
+    return total;
+}
+
+public long calcularCustoTotal() {
+
+    long total = 0;
+
+    for (Despesa despesa : despesas) {
+        total += despesa.getValor();
+    }
+
+    return total;
+}
+
+public long calcularValorExcedido(int codigo) {
+
+    Participante participanteEncontrado = null;
+
+    for (Participante participante : participantes) {
+
+        if (participante.getCodigo() == codigo) {
+            participanteEncontrado = participante;
+            break;
+        }
+    }
+
+    if (participanteEncontrado == null) {
+        return 0;
+    }
+
+    long total = calcularTotalParticipante(codigo);
+
+    return Math.max(
+        0,
+        total - participanteEncontrado.getOrcamento()
+    );
+}
+
+public boolean estaDentroDoOrcamento(int codigo) {
+
+    return calcularValorExcedido(codigo) == 0;
+}
 
