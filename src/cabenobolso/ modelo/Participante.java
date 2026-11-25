@@ -1,3 +1,4 @@
+
 package cabenobolso.modelo;
 
 import cabenobolso.excecao.DadosInvalidosException;
@@ -8,12 +9,15 @@ public class Participante implements Serializable {
 
     private final int codigo;
     private String nome;
-    private long orcamento; 
+    private long orcamento;
 
     public Participante(int codigo, String nome, long orcamento)
             throws DadosInvalidosException {
+
+        validarCodigo(codigo);
         validarNome(nome);
         validarOrcamento(orcamento);
+
         this.codigo = codigo;
         this.nome = nome.trim();
         this.orcamento = orcamento;
@@ -28,18 +32,33 @@ public class Participante implements Serializable {
         this.nome = nome.trim();
     }
 
-    public void setOrcamento(long orcamento) throws DadosInvalidosException {
+    public void setOrcamento(long orcamento)
+            throws DadosInvalidosException {
         validarOrcamento(orcamento);
         this.orcamento = orcamento;
     }
 
-    private static void validarNome(String nome) throws DadosInvalidosException {
-        if (nome == null || nome.isBlank())
-            throw new DadosInvalidosException("O nome não pode ser vazio.");
+    private static void validarCodigo(int codigo)
+            throws DadosInvalidosException {
+        if (codigo <= 0) {
+            throw new DadosInvalidosException(
+                    "O código deve ser maior que zero.");
+        }
     }
 
-    private static void validarOrcamento(long orcamento) throws DadosInvalidosException {
-        if (orcamento < 0)
-            throw new DadosInvalidosException("O orçamento não pode ser negativo.");
+    private static void validarNome(String nome)
+            throws DadosInvalidosException {
+        if (nome == null || nome.isBlank()) {
+            throw new DadosInvalidosException(
+                    "O nome não pode ser vazio.");
+        }
+    }
+
+    private static void validarOrcamento(long orcamento)
+            throws DadosInvalidosException {
+        if (orcamento < 0) {
+            throw new DadosInvalidosException(
+                    "O orçamento não pode ser negativo.");
+        }
     }
 }
