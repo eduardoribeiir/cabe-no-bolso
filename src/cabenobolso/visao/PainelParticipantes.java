@@ -18,7 +18,6 @@ import java.awt.GridBagLayout;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Aba de cadastro, alteração de orçamento e exclusão de participantes. */
 class PainelParticipantes extends JPanel {
 
     private final PlanejamentoControle controle;
@@ -71,14 +70,17 @@ class PainelParticipantes extends JPanel {
         JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 4));
         JButton btnAdicionar = new JButton("Adicionar");
         JButton btnAlterar = new JButton("Alterar orçamento");
+        JButton btnNome = new JButton("Alterar nome");
         JButton btnExcluir = new JButton("Excluir selecionado");
         JButton btnLimpar = new JButton("Limpar campos");
         btnAdicionar.addActionListener(e -> adicionar());
         btnAlterar.addActionListener(e -> alterarOrcamento());
+        btnNome.addActionListener(e -> alterarNome());
         btnExcluir.addActionListener(e -> excluir());
         btnLimpar.addActionListener(e -> limparCampos());
         p.add(btnAdicionar);
         p.add(btnAlterar);
+        p.add(btnNome);
         p.add(btnExcluir);
         p.add(btnLimpar);
         return p;
@@ -92,9 +94,14 @@ class PainelParticipantes extends JPanel {
         }
     }
 
-    /** Usa o código e o orçamento digitados (o código é preenchido ao clicar na tabela). */
     private void alterarOrcamento() {
         if (Apoio.exibir(this, controle.alterarOrcamento(txtCodigo.getText(), txtOrcamento.getText()))) {
+            limparCampos();
+        }
+    }
+
+    private void alterarNome() {
+        if (Apoio.exibir(this, controle.alterarNome(txtCodigo.getText(), txtNome.getText()))) {
             limparCampos();
         }
     }

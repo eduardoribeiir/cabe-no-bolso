@@ -1,153 +1,132 @@
 package cabenobolso.modelo;
 
+import cabenobolso.excecao.EntradaInvalidaException;
+
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import cabenobolso.excecao.DadosInvalidosException;
 
 public class Planejamento implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private List<Participante> participantes;
-    private List<Despesa> despesas;
+    private final Map<Integer, Participante> participantes = new LinkedHashMap<>();
+    private final List<Despesa> despesas = new ArrayList<>();
 
-    public Planejamento() {
-        participantes = new ArrayList<>();
-        despesas = new ArrayList<>();
-    }
-
-    public void adicionarParticipante(Participante participante)
-            throws DadosInvalidosException {
-
-        if (participante == null) {
-            throw new DadosInvalidosException(
-                "Participante inválido.");
+    public void adicionarParticipante(int codigo, String nome, BigDecimal orcamento)
+            throws EntradaInvalidaException {
+        if (participantes.containsKey(codigo)) {
+            throw new EntradaInvalidaException("Código de participante já cadastrado.");
         }
-
-        for (Participante p : participantes) {
-            if (p.getCodigo() == participante.getCodigo()) {
-                throw new DadosInvalidosException(
-                    "Código de participante já cadastrado.");
-            }
-        }
-
-        participantes.add(participante);
+        participantes.put(codigo, new Participante(codigo, nome, orcamento));
     }
 
-    public void adicionarDespesa(Despesa despesa) {
-        despesas.add(despesa);
+    public void alterarOrcamento(int codigo, BigDecimal orcamento)
+            throws EntradaInvalidaException {
+        localizarParticipante(codigo).alterarOrcamento(orcamento);
     }
 
-    public List<Participante> getParticipantes() {
-        return new ArrayList<>(participantes);
+    public void alterarNome(int codigo, String nome) throws EntradaInvalidaException {
+        localizarParticipante(codigo).alterarNome(nome);
     }
 
-    public List<Despesa> getDespesas() {
-        return new ArrayList<>(despesas);
-    }
-
-    public void excluirDespesa(Despesa despesa) {
-        despesas.remove(despesa);
-    }
-
-    public void substituirDespesa(Despesa antiga, Despesa nova)
-            throws DadosInvalidosException {
-
-        if (nova == null) {
-            throw new DadosInvalidosException(
-                "Despesa inválida.");
-        }
-
-        int indice = despesas.indexOf(antiga);
-
-        if (indice < 0) {
-            throw new DadosInvalidosException(
-                "Despesa não encontrada.");
-        }
-
-        despesas.set(indice, nova);
-    }
-
-    public void excluirParticipante(int codigo)
-            throws DadosInvalidosException {
-
-        Participante participante = buscarParticipante(codigo);
-
-        if (participante == null) {
-            throw new DadosInvalidosException(
-                "Participante não encontrado.");
-        }
-
+    public void removerParticipante(int codigo) throws EntradaInvalidaException {
+        Participante participante = localizarParticipante(codigo);
         for (Despesa despesa : despesas) {
-            if (despesa.envolveParticipante(codigo)) {
-                throw new DadosInvalidosException(
-                    "Não é possível excluir: o participante está "
-                    + "vinculado à despesa \"" + despesa.getDescricao()
-                    + "\".");
+            if (despesa.getParticipantes().contains(participante)) {
+                throw new EntradaInvalidaException(
+                        "Não é possível excluir: o participante está vinculado à despesa \""
+                                + despesa.getDescricao() + "\".");
             }
         }
-
-        participantes.remove(participante);
+        participantes.remove(codigo);
     }
 
-    private Participante buscarParticipante(int codigo) {
+    public List<Participante> listarParticipantes() {
+        return Collections.unmodifiableList(new ArrayList<>(participantes.values()));
+    }
 
-        for (Participante participante : participantes) {
-            if (participante.getCodigo() == codigo) {
-                return participante;
-            }
+    public void adicionarDespesaFixa(String descricao, BigDecimal valor,
+                                     List<Integer> codigos)
+            throws EntradaInvalidaException {
+        despesas.add(new DespesaFixa(descricao, valor, resolverParticipantes(codigos)));
+    }
+
+    public void adicionarDespesaPorPessoa(String descricao, BigDecimal valor,
+                                          List<Integer> codigos)
+            throws EntradaInvalidaException {
+        despesas.add(new DespesaPorPessoa(descricao, valor, resolverParticipantes(codigos)));
+    }
+
+    public void editarDespesa(int indice, String descricao, BigDecimal valor,
+                              boolean fixa, List<Integer> codigos)
+            throws EntradaInvalidaException {
+        if (indice < 0 || indice >= despesas.size()) {
+            throw new EntradaInvalidaException("Despesa não encontrada.");
         }
-
-        return null;
+        List<Participante> selecionados = resolverParticipantes(codigos);
+        Despesa atualizada = fixa
+                ? new DespesaFixa(descricao, valor, selecionados)
+                : new DespesaPorPessoa(descricao, valor, selecionados);
+        despesas.set(indice, atualizada);
     }
 
-    public long calcularTotalParticipante(int codigo) {
+    public void removerDespesa(int indice) throws EntradaInvalidaException {
+        if (indice < 0 || indice >= despesas.size()) {
+            throw new EntradaInvalidaException("Despesa não encontrada.");
+        }
+        despesas.remove(indice);
+    }
 
-        long total = 0;
+    public List<Despesa> listarDespesas() {
+        return Collections.unmodifiableList(new ArrayList<>(despesas));
+    }
 
+    public BigDecimal custoTotal() {
+        BigDecimal total = BigDecimal.ZERO.setScale(2);
         for (Despesa despesa : despesas) {
-
-            Map<Integer, Long> rateio =
-                despesa.calcularRateio();
-
-            total += rateio.getOrDefault(codigo, 0L);
+            total = total.add(despesa.custoTotal());
         }
-
         return total;
     }
 
-    public long calcularCustoTotal() {
-
-        long total = 0;
-
-        for (Despesa despesa : despesas) {
-            total += despesa.calcularCustoTotal();
+    public List<ResultadoParticipante> calcularResultados() {
+        List<ResultadoParticipante> resultados = new ArrayList<>();
+        for (Participante participante : participantes.values()) {
+            BigDecimal custo = BigDecimal.ZERO.setScale(2);
+            for (Despesa despesa : despesas) {
+                custo = custo.add(despesa.custoDe(participante.getCodigo()));
+            }
+            resultados.add(new ResultadoParticipante(participante, custo));
         }
-
-        return total;
+        return Collections.unmodifiableList(resultados);
     }
 
-    public long calcularValorExcedido(int codigo) {
-
-        Participante participanteEncontrado = buscarParticipante(codigo);
-
-        if (participanteEncontrado == null) {
-            return 0;
+    private Participante localizarParticipante(int codigo) throws EntradaInvalidaException {
+        Participante participante = participantes.get(codigo);
+        if (participante == null) {
+            throw new EntradaInvalidaException("Participante não encontrado.");
         }
-
-        long total = calcularTotalParticipante(codigo);
-
-        return Math.max(
-            0,
-            total - participanteEncontrado.getOrcamento()
-        );
+        return participante;
     }
 
-    public boolean estaDentroDoOrcamento(int codigo) {
-
-        return calcularValorExcedido(codigo) == 0;
+    private List<Participante> resolverParticipantes(List<Integer> codigos)
+            throws EntradaInvalidaException {
+        if (codigos == null || codigos.isEmpty()) {
+            throw new EntradaInvalidaException(
+                    "Selecione ao menos um participante para a despesa.");
+        }
+        List<Participante> selecionados = new ArrayList<>();
+        for (Integer codigo : codigos) {
+            if (codigo == null) {
+                throw new EntradaInvalidaException("Há um participante inválido na seleção.");
+            }
+            selecionados.add(localizarParticipante(codigo));
+        }
+        return selecionados;
     }
 }

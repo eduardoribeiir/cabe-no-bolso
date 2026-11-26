@@ -14,10 +14,13 @@ e siga os passos abaixo.
 | 3 | Código duplicado | Cadastrar participante com código já existente | Recusa com mensagem; dados inalterados | _preencher_ | `docs/evidencias/t03d.png` |
 | 4 | Alteração de orçamento | No caso principal, mudar orçamento de Ana para R$ 80,00 | Custo de Ana continua R$ 75,00 e agora está dentro do limite | _preencher_ | `docs/evidencias/t04.png` |
 | 5 | Exclusão de despesa | No caso principal original, excluir "Atividade recreativa" | R$ 60,00 por pessoa; total R$ 180,00 | _preencher_ | `docs/evidencias/t05.png` |
-| 6 | Salvar e reiniciar | Salvar, fechar, abrir, carregar | Todos os dados, vínculos e resultados voltam, sem duplicar registros | _preencher_ | `docs/evidencias/t06.png` |
+| 6 | Salvar e reiniciar | Salvar dois planejamentos com nomes diferentes, fechar, abrir e escolher um na lista | O planejamento escolhido e seus dados, vínculos e resultados voltam sem duplicação | _preencher_ | `docs/evidencias/t06.png` |
 | 7 | Arquivo ausente | Carregar com arquivo inexistente | Mensagem clara; permite iniciar planejamento vazio | _preencher_ | `docs/evidencias/t07a.png` |
 | 7 | Arquivo inválido | Carregar um arquivo qualquer (ex.: .txt renomeado) | Mensagem clara; planejamento em uso preservado | _preencher_ | `docs/evidencias/t07b.png` |
 | 8 | Excluir participante vinculado | (se implementado) excluir participante com despesas | Exclusão impedida com mensagem | _preencher_ | `docs/evidencias/t08.png` |
+| 9 | Alterar nome | Selecionar participante, informar nome válido e alterar | Nome atualizado no cadastro e nos resumos, sem alterar orçamento ou despesas | _preencher_ | `docs/evidencias/t09.png` |
+| 10 | Editar despesa | Selecionar despesa, alterar descrição, valor, tipo ou participantes | Despesa atualizada e totais/rateios recalculados | _preencher_ | `docs/evidencias/t10.png` |
+| 11 | Edição inválida | Tentar editar despesa com valor inválido ou sem participantes | Recusa com mensagem; despesa e totais permanecem inalterados | _preencher_ | `docs/evidencias/t11.png` |
 
 ## Testes do objetivo extra (somente se implementado)
 

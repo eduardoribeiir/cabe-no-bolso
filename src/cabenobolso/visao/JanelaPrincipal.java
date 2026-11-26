@@ -8,7 +8,6 @@ import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-/** V (Visão): janela principal com as abas Participantes, Despesas, Resumo e Persistência. */
 public class JanelaPrincipal extends JFrame {
 
     public JanelaPrincipal(PlanejamentoControle controle) {

@@ -1,9 +1,5 @@
 package cabenobolso.controle;
 
-/**
- * Resultado de uma ação executada pelo controle: sucesso ou erro, sempre com
- * uma mensagem clara para ser exibida ao usuário pela visão.
- */
 public final class Resposta {
 
     private final boolean sucesso;
