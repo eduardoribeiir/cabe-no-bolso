@@ -1,3 +1,10 @@
+# Diagrama de Classes UML — Cabe no Bolso
+
+Este diagrama representa a estrutura de classes do sistema,
+seus atributos, métodos e relacionamentos.
+
+```mermaid
+
 classDiagram
 direction TB
 
@@ -74,3 +81,4 @@ Participante "0..*" -- "0..*" Despesa
 Despesa <|-- DespesaFixa
 Despesa <|-- DespesaPorPessoa
 Persistencia <|.. PersistenciaArquivos
+```
