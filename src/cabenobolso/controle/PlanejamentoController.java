@@ -1,4 +1,3 @@
-
 package cabenobolso.controle;
 
 import cabenobolso.modelo.*;
@@ -150,6 +149,41 @@ public class PlanejamentoController {
         planejamento.excluirDespesa(despesa);
     }
 
+    public void editarDespesaFixa(
+            Despesa original, String descricao, long valor,
+            List<Participante> participantes)
+            throws DadosInvalidosException {
+
+        List<Participante> selecionados =
+            validarParticipantes(participantes);
+
+        Despesa nova = new DespesaFixa(
+            descricao, valor, selecionados
+        );
+
+        planejamento.substituirDespesa(original, nova);
+    }
+
+    public void editarDespesaPorPessoa(
+            Despesa original, String descricao, long valor,
+            List<Participante> participantes)
+            throws DadosInvalidosException {
+
+        List<Participante> selecionados =
+            validarParticipantes(participantes);
+
+        Despesa nova = new DespesaPorPessoa(
+            descricao, valor, selecionados
+        );
+
+        planejamento.substituirDespesa(original, nova);
+    }
+
+    public void excluirParticipante(int codigo)
+            throws DadosInvalidosException {
+        planejamento.excluirParticipante(codigo);
+    }
+
     public void salvar() throws IOException {
         persistencia.salvar(planejamento);
     }
@@ -168,4 +202,3 @@ public class PlanejamentoController {
         planejamento = carregado;
     }
 }
-
