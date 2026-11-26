@@ -102,13 +102,28 @@ Veja `testes/ROTEIRO_TESTES.md`. Cada teste registra entrada, resultado esperado
 
 Diagrama de classes em `docs/uml/` e justificativas em `docs/MODELAGEM.md`.
 
-## Objetivo extra (opcional)
+## Objetivo extra: simulador de alternativas
 
-Na aba *Simulador*, escolha *Opcional* na classificação das despesas que podem ser retiradas; as demais permanecem essenciais. Cada opcional começa com prioridade 1, que pode ser ajustada para qualquer inteiro positivo. Depois clique em *Gerar sugestão automática*: o simulador encontra a combinação viável de maior prioridade total, respeitando o orçamento de todos. Se não houver solução porque as essenciais já excedem algum orçamento, a tela informa os excessos e orienta revisar a classificação. A simulação não altera o planejamento.
+O simulador ajuda a ajustar o planejamento quando os gastos ultrapassam os orçamentos. Ele sugere quais despesas opcionais manter ou retirar para que **cada participante** fique dentro do próprio limite, preservando as despesas essenciais.
 
-São aceitas até dez opcionais. O algoritmo mantém as essenciais e examina todas as combinações possíveis das opcionais (no máximo 1.024), verificando o custo de cada participante. Entre as combinações dentro de todos os orçamentos, escolhe uma com a maior soma de prioridades; qualquer empate ótimo é aceito. Se as essenciais já ultrapassarem algum orçamento, informa que não há solução e mostra os excessos.
+### Como usar
 
-Como cada combinação é examinada e as inviáveis são descartadas, nenhuma solução viável de prioridade maior fica de fora. O custo da busca cresce com `2^n`, onde `n` é a quantidade de despesas opcionais; o limite de dez mantém a busca em até 1.024 combinações.
+1. Cadastre os participantes, seus orçamentos e as despesas do planejamento.
+2. Na aba **Simulador**, deixe como **Essencial** as despesas que não podem ser retiradas. Todas começam nessa classificação.
+3. Marque como **Opcional** as despesas que podem ser retiradas. Cada uma recebe prioridade 1; aumente esse número inteiro positivo para indicar maior importância.
+4. Clique em **Gerar sugestão automática**. O resultado mostra as despesas mantidas e retiradas, os gastos de cada pessoa antes e depois e o custo total.
+
+A sugestão não altera o planejamento: para adotá-la, é preciso editar ou excluir as despesas nas telas do aplicativo.
+
+### Como a sugestão é escolhida
+
+O simulador mantém todas as despesas essenciais e testa as combinações das opcionais. Entre as que respeitam todos os orçamentos, escolhe uma com a maior **soma das prioridades das opcionais mantidas**. Isso não significa necessariamente manter a despesa individual de maior prioridade: duas opcionais com prioridades 4 e 4 podem ser preferidas a uma de prioridade 6. Em caso de empate, qualquer combinação ótima pode ser escolhida.
+
+Por exemplo, no [caso de referência](dados/CASO_REFERENCIA.md), Ana e Carla têm orçamento de R$ 70,00 cada e Bruno, de R$ 60,00. Com todas as despesas, os gastos são R$ 75,00, R$ 60,00 e R$ 75,00, respectivamente. Se transporte e almoço forem essenciais, e atividade recreativa e sobremesa forem opcionais com prioridades 3 e 1, a sugestão mantém a atividade e retira a sobremesa. Os gastos passam a R$ 65,00 para Ana, R$ 50,00 para Bruno e R$ 65,00 para Carla; o custo total passa de R$ 210,00 para R$ 180,00.
+
+Se as despesas essenciais, sozinhas, ultrapassarem o orçamento de alguém, não há solução com a classificação atual. A tela mostra os excessos; se possível, marque alguma essencial como opcional e simule novamente.
+
+São aceitas até **10 despesas opcionais**. A busca examina até `2^n` combinações, onde `n` é o número de opcionais: no máximo 1.024 combinações.
 
 O caso de referência e os demais cenários estão em `testes/ROTEIRO_TESTES.md`. Para executar os testes automatizados no Windows, após compilar a aplicação:
 
