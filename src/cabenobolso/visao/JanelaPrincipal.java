@@ -17,6 +17,7 @@ public class JanelaPrincipal extends JFrame {
         abas.addTab("Participantes", new PainelParticipantes(controle));
         abas.addTab("Despesas", new PainelDespesas(controle));
         abas.addTab("Resumo", new PainelResumo(controle));
+        abas.addTab("Simulador", new PainelSimulador(controle));
         abas.addTab("Persistência", new PainelPersistencia(controle));
         add(abas);
 

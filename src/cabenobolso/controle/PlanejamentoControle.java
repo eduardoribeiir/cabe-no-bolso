@@ -3,6 +3,8 @@ package cabenobolso.controle;
 import cabenobolso.excecao.ArquivoException;
 import cabenobolso.excecao.CabeNoBolsoException;
 import cabenobolso.excecao.EntradaInvalidaException;
+import cabenobolso.extra.ResultadoSimulacao;
+import cabenobolso.extra.SimuladorAlternativas;
 import cabenobolso.modelo.Despesa;
 import cabenobolso.modelo.Participante;
 import cabenobolso.modelo.Planejamento;
@@ -124,6 +126,11 @@ public class PlanejamentoControle {
 
     public List<ResultadoParticipante> resultados() {
         return planejamento.calcularResultados();
+    }
+
+    public ResultadoSimulacao simularAlternativas(List<Integer> prioridades)
+            throws EntradaInvalidaException {
+        return SimuladorAlternativas.simular(planejamento, prioridades);
     }
 
     public Resposta salvar() {
