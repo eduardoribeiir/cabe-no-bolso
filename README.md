@@ -6,12 +6,12 @@ Aplicação Java com interface gráfica Swing para planejar despesas de um passe
 > **Equipe:**
 
 
-> 1. LUCAS CAUÃ FERREIRA MARTINS – matrícula
-> 2. LUIZ EDUARDO PAIVA RIBEIRO – matrícula
-> 3. MARIA CLARA DA SILVA MARTINS – matrícula
-> 4. MARIA EDUARDA BESSA BRAZ – matrícula
-> 5. NINA RAFAELA ARAUJO DA SILVA – matrícula
-> 6. RISOLETA PEREIRA PINTO – matrícula
+> 1. LUCAS CAUÃ FERREIRA MARTINS – 2641642
+> 2. LUIZ EDUARDO PAIVA RIBEIRO – 2640860
+> 3. MARIA CLARA DA SILVA MARTINS – 2640859
+> 4. MARIA EDUARDA BESSA BRAZ – 2640861
+> 5. NINA RAFAELA ARAUJO DA SILVA – 2640875
+> 6. RISOLETA PEREIRA PINTO – 2323869
 
 > **Repositório GitHub:** (https://github.com/eduardoribeiir/cabe-no-bolso)
 
@@ -82,9 +82,13 @@ java -cp out cabenobolso.Main
 
 ## Salvar e recuperar o planejamento
 
-O planejamento é salvo por **serialização de objetos** em arquivo local (padrão: `planejamento.dat`, na pasta de execução).
-Para testar: cadastre os dados, use *Salvar*, feche o programa, abra de novo e use *Carregar*. Os dados, vínculos e resultados devem voltar sem duplicação.
-Se o arquivo não existir ou for inválido, o programa exibe mensagem e permite iniciar um planejamento vazio; uma falha ao carregar preserva o planejamento em uso.
+Os planejamentos são salvos por **serialização de objetos** em arquivos separados na pasta `planejamentos/`, criada na pasta de execução.
+
+Ao usar *Salvar*, informe um nome, como "Férias de janeiro". Se já existir um planejamento com esse nome, o programa pede confirmação antes de substituí-lo. Para recuperar um planejamento, use *Carregar* e escolha o nome na lista.
+
+Se houver um arquivo antigo `planejamento.dat` na pasta de execução, ele também aparece na lista e pode ser carregado se for compatível. Quando não há planejamentos salvos ou ocorre uma falha, o programa exibe uma mensagem; uma falha ao carregar preserva o planejamento em uso.
+
+Para testar, salve dois planejamentos com nomes diferentes, feche e reabra o programa e carregue cada um pela lista. Os dados, vínculos e resultados devem voltar sem duplicação.
 
 ## Dados de exemplo
 
@@ -100,7 +104,19 @@ Diagrama de classes em `docs/uml/` e justificativas em `docs/MODELAGEM.md`.
 
 ## Objetivo extra (opcional)
 
-Se realizado, o simulador fica em `src/cabenobolso/extra/`, com entradas, sugestões e testes (incluindo o caso sem solução) documentados em `testes/`.
+Na aba *Simulador*, escolha *Opcional* na classificação das despesas que podem ser retiradas; as demais permanecem essenciais. Cada opcional começa com prioridade 1, que pode ser ajustada para qualquer inteiro positivo. Depois clique em *Gerar sugestão automática*: o simulador encontra a combinação viável de maior prioridade total, respeitando o orçamento de todos. Se não houver solução porque as essenciais já excedem algum orçamento, a tela informa os excessos e orienta revisar a classificação. A simulação não altera o planejamento.
+
+São aceitas até dez opcionais. O algoritmo mantém as essenciais e examina todas as combinações possíveis das opcionais (no máximo 1.024), verificando o custo de cada participante. Entre as combinações dentro de todos os orçamentos, escolhe uma com a maior soma de prioridades; qualquer empate ótimo é aceito. Se as essenciais já ultrapassarem algum orçamento, informa que não há solução e mostra os excessos.
+
+Como cada combinação é examinada e as inviáveis são descartadas, nenhuma solução viável de prioridade maior fica de fora. O custo da busca cresce com `2^n`, onde `n` é a quantidade de despesas opcionais; o limite de dez mantém a busca em até 1.024 combinações.
+
+O caso de referência e os demais cenários estão em `testes/ROTEIRO_TESTES.md`. Para executar os testes automatizados no Windows, após compilar a aplicação:
+
+```bat
+javac -encoding UTF-8 -cp out -d out testes\TestesSimulador.java testes\TestesSimuladorVisao.java
+java -cp out TestesSimulador
+java -Djava.awt.headless=true -cp out cabenobolso.visao.TestesSimuladorVisao
+```
 
 ## Uso de IA e fontes externas
 

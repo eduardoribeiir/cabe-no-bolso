@@ -21,11 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Aba de resumo: lista as despesas, mostra o custo total, o total de cada
- * participante, se está dentro ou acima do orçamento e quanto excedeu.
- * Só exibe valores calculados pelo modelo; é redesenhada a cada alteração.
- */
 class PainelResumo extends JPanel {
 
     private static final String DENTRO = "Dentro do orçamento";
@@ -84,7 +79,6 @@ class PainelResumo extends JPanel {
         }
         lblTotal.setText("Custo total: " + Apoio.moeda(controle.custoTotal()));
 
-        // Colunas: dados do participante + uma coluna por despesa + total, situação e excesso.
         List<Object> colunas = new ArrayList<>();
         colunas.add("Código");
         colunas.add("Nome");

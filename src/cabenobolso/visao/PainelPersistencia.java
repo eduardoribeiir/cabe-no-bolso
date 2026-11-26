@@ -2,6 +2,7 @@ package cabenobolso.visao;
 
 import cabenobolso.controle.PlanejamentoControle;
 import cabenobolso.controle.Resposta;
+import cabenobolso.excecao.ArquivoException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -10,12 +11,13 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
-/** Aba com as ações Salvar, Carregar e Novo planejamento. */
 class PainelPersistencia extends JPanel {
 
     private static final DateTimeFormatter HORA = DateTimeFormatter.ofPattern("HH:mm:ss");
@@ -28,7 +30,8 @@ class PainelPersistencia extends JPanel {
         this.controle = controle;
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        JLabel ajuda = new JLabel("<html>Salve o planejamento completo em arquivo e carregue-o depois. "
+        JLabel ajuda = new JLabel("<html>Salve cada planejamento com um nome para manter várias versões "
+                + "e escolha qual recuperar. "
                 + "<b>Novo</b> descarta os dados atuais e inicia um planejamento vazio.</html>");
 
         JPanel botoes = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 8));
@@ -54,7 +57,35 @@ class PainelPersistencia extends JPanel {
     }
 
     private void salvar() {
-        Resposta r = controle.salvar();
+        String nome = JOptionPane.showInputDialog(this,
+                "Nome do planejamento (ex.: Férias de janeiro):",
+                "Salvar planejamento", JOptionPane.QUESTION_MESSAGE);
+        if (nome == null) {
+            return;
+        }
+        nome = nome.trim();
+        if (nome.isEmpty()) {
+            Apoio.erro(this, "Informe um nome para o planejamento.");
+            return;
+        }
+
+        try {
+            for (String existente : controle.listarPlanejamentos()) {
+                if (existente.equalsIgnoreCase(nome)) {
+                    if (!Apoio.confirmar(this, "Já existe um planejamento chamado \""
+                            + existente + "\". Deseja substituí-lo?")) {
+                        return;
+                    }
+                    break;
+                }
+            }
+        } catch (ArquivoException e) {
+            registrar(e.getMessage());
+            Apoio.erro(this, e.getMessage());
+            return;
+        }
+
+        Resposta r = controle.salvar(nome);
         registrar(r.getMensagem());
         if (r.isSucesso()) {
             Apoio.info(this, r.getMensagem());
@@ -64,16 +95,34 @@ class PainelPersistencia extends JPanel {
     }
 
     private void carregar() {
+        List<String> nomes;
+        try {
+            nomes = controle.listarPlanejamentos();
+        } catch (ArquivoException e) {
+            registrar(e.getMessage());
+            Apoio.erro(this, e.getMessage());
+            return;
+        }
+        if (nomes.isEmpty()) {
+            Apoio.info(this, "Ainda não há planejamentos salvos.");
+            return;
+        }
+        Object selecionado = JOptionPane.showInputDialog(this,
+                "Escolha qual planejamento deseja carregar:",
+                "Carregar planejamento", JOptionPane.QUESTION_MESSAGE,
+                null, nomes.toArray(), nomes.get(0));
+        if (selecionado == null) {
+            return;
+        }
         if (!Apoio.confirmar(this, "Carregar substitui o planejamento atual. Continuar?")) {
             return;
         }
-        Resposta r = controle.carregar();
+        Resposta r = controle.carregar(selecionado.toString());
         registrar(r.getMensagem());
         if (r.isSucesso()) {
             Apoio.info(this, r.getMensagem());
             return;
         }
-        // Falhou: o planejamento atual foi preservado; o usuário pode optar por começar vazio.
         int opcao = JOptionPane.showConfirmDialog(this,
                 r.getMensagem() + "\n\nO planejamento atual foi mantido.\n"
                         + "Deseja iniciar um planejamento vazio?",

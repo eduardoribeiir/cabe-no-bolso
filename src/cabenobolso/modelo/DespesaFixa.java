@@ -1,28 +1,21 @@
 package cabenobolso.modelo;
 
+import cabenobolso.excecao.EntradaInvalidaException;
+
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Comparator;
+import java.math.BigInteger;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
-
-import cabenobolso.excecao.DadosInvalidosException;
 
 public class DespesaFixa extends Despesa {
 
     private static final long serialVersionUID = 1L;
 
-    public DespesaFixa(String descricao, long valor,
+    public DespesaFixa(String descricao, BigDecimal valor,
                        List<Participante> participantes)
-                       throws DadosInvalidosException {
+            throws EntradaInvalidaException {
         super(descricao, valor, participantes);
-    }
-
-    public DespesaFixa(String descricao, BigDecimal valorReais,
-                       List<Participante> participantes)
-                       throws DadosInvalidosException {
-        super(descricao, valorReais, participantes);
     }
 
     @Override
@@ -31,42 +24,21 @@ public class DespesaFixa extends Despesa {
     }
 
     @Override
-    public Map<Integer, Long> calcularRateio() {
+    public Map<Integer, BigDecimal> calcularRateio() {
+        BigInteger centavos = getValor().movePointRight(2).toBigIntegerExact();
+        BigInteger[] divisao = centavos.divideAndRemainder(
+                BigInteger.valueOf(getParticipantes().size()));
+        int centavosRestantes = divisao[1].intValueExact();
+        Map<Integer, BigDecimal> rateio = new LinkedHashMap<>();
 
-        Map<Integer, Long> resultado = new TreeMap<>();
-
-        List<Participante> selecionados =
-            new ArrayList<>(getParticipantes());
-
-        selecionados.sort(
-            Comparator.comparingInt(Participante::getCodigo)
-        );
-
-        int quantidade = selecionados.size();
-        long valorBase = getValor() / quantidade;
-        long centavosRestantes = getValor() % quantidade;
-
-        for (int i = 0; i < quantidade; i++) {
-
-            Participante participante = selecionados.get(i);
-
-            long valorIndividual = valorBase;
-
-            if (i < centavosRestantes) {
-                valorIndividual++;
+        for (int indice = 0; indice < getParticipantes().size(); indice++) {
+            BigInteger parcela = divisao[0];
+            if (indice < centavosRestantes) {
+                parcela = parcela.add(BigInteger.ONE);
             }
-
-            resultado.put(
-                participante.getCodigo(),
-                valorIndividual
-            );
+            int codigo = getParticipantes().get(indice).getCodigo();
+            rateio.put(codigo, new BigDecimal(parcela, 2));
         }
-
-        return resultado;
-    }
-
-    @Override
-    public long calcularCustoTotal() {
-        return getValor();
+        return rateio;
     }
 }

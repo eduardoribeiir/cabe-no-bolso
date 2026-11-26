@@ -13,7 +13,6 @@ import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-/** Funções de apoio da visão: formatação, diálogos e montagem de layout. Sem regra de negócio. */
 final class Apoio {
 
     private static final NumberFormat MOEDA =
@@ -45,7 +44,6 @@ final class Apoio {
                 JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION;
     }
 
-    /** Mostra a mensagem de erro, se houver, e devolve se a ação teve sucesso. */
     static boolean exibir(Component pai, Resposta resposta) {
         if (!resposta.isSucesso()) {
             erro(pai, resposta.getMensagem());
