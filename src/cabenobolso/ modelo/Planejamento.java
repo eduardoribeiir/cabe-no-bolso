@@ -1,8 +1,9 @@
-package cabenobolso.modelo;    
+package cabenobolso.modelo;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import cabenobolso.excecao.DadosInvalidosException;
 
@@ -20,6 +21,11 @@ public class Planejamento implements Serializable {
 
     public void adicionarParticipante(Participante participante)
             throws DadosInvalidosException {
+
+        if (participante == null) {
+            throw new DadosInvalidosException(
+                "Participante inválido.");
+        }
 
         for (Participante p : participantes) {
             if (p.getCodigo() == participante.getCodigo()) {
@@ -46,63 +52,102 @@ public class Planejamento implements Serializable {
     public void excluirDespesa(Despesa despesa) {
         despesas.remove(despesa);
     }
-}
- 
-import java.util.Map;
-import java.util.HashMap;
 
-public long calcularTotalParticipante(int codigo) {
+    public void substituirDespesa(Despesa antiga, Despesa nova)
+            throws DadosInvalidosException {
 
-    long total = 0;
-
-    for (Despesa despesa : despesas) {
-
-        Map<Integer, Long> rateio =
-            despesa.calcularRateio();
-
-        total += rateio.getOrDefault(codigo, 0L);
-    }
-
-    return total;
-}
-
-public long calcularCustoTotal() {
-
-    long total = 0;
-
-    for (Despesa despesa : despesas) {
-        total += despesa.getValor();
-    }
-
-    return total;
-}
-
-public long calcularValorExcedido(int codigo) {
-
-    Participante participanteEncontrado = null;
-
-    for (Participante participante : participantes) {
-
-        if (participante.getCodigo() == codigo) {
-            participanteEncontrado = participante;
-            break;
+        if (nova == null) {
+            throw new DadosInvalidosException(
+                "Despesa inválida.");
         }
+
+        int indice = despesas.indexOf(antiga);
+
+        if (indice < 0) {
+            throw new DadosInvalidosException(
+                "Despesa não encontrada.");
+        }
+
+        despesas.set(indice, nova);
     }
 
-    if (participanteEncontrado == null) {
-        return 0;
+    public void excluirParticipante(int codigo)
+            throws DadosInvalidosException {
+
+        Participante participante = buscarParticipante(codigo);
+
+        if (participante == null) {
+            throw new DadosInvalidosException(
+                "Participante não encontrado.");
+        }
+
+        for (Despesa despesa : despesas) {
+            if (despesa.envolveParticipante(codigo)) {
+                throw new DadosInvalidosException(
+                    "Não é possível excluir: o participante está "
+                    + "vinculado à despesa \"" + despesa.getDescricao()
+                    + "\".");
+            }
+        }
+
+        participantes.remove(participante);
     }
 
-    long total = calcularTotalParticipante(codigo);
+    private Participante buscarParticipante(int codigo) {
 
-    return Math.max(
-        0,
-        total - participanteEncontrado.getOrcamento()
-    );
+        for (Participante participante : participantes) {
+            if (participante.getCodigo() == codigo) {
+                return participante;
+            }
+        }
+
+        return null;
+    }
+
+    public long calcularTotalParticipante(int codigo) {
+
+        long total = 0;
+
+        for (Despesa despesa : despesas) {
+
+            Map<Integer, Long> rateio =
+                despesa.calcularRateio();
+
+            total += rateio.getOrDefault(codigo, 0L);
+        }
+
+        return total;
+    }
+
+    public long calcularCustoTotal() {
+
+        long total = 0;
+
+        for (Despesa despesa : despesas) {
+            total += despesa.calcularCustoTotal();
+        }
+
+        return total;
+    }
+
+    public long calcularValorExcedido(int codigo) {
+
+        Participante participanteEncontrado = buscarParticipante(codigo);
+
+        if (participanteEncontrado == null) {
+            return 0;
+        }
+
+        long total = calcularTotalParticipante(codigo);
+
+        return Math.max(
+            0,
+            total - participanteEncontrado.getOrcamento()
+        );
+    }
+
+    public boolean estaDentroDoOrcamento(int codigo) {
+
+        return calcularValorExcedido(codigo) == 0;
+    }
 }
-
-public boolean estaDentroDoOrcamento(int codigo) {
-
-    return calcularValorExcedido(codigo) == 0;
-}
-
