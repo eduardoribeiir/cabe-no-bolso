@@ -159,7 +159,7 @@ class Resposta {
 }
 
 class PlanejamentoController {
-  <<legado - usado apenas em testes>>
+  <<legado>>
   -Planejamento planejamento
   -Persistencia persistencia
   +PlanejamentoController(Persistencia persistencia)
@@ -269,31 +269,29 @@ Planejamento "1" *-- "0..*" Despesa : despesas
 Despesa "0..*" --> "1..*" Participante : participantes
 Despesa <|-- DespesaFixa
 Despesa <|-- DespesaPorPessoa
-Planejamento ..> ResultadoParticipante : «cria»
+Planejamento ..> ResultadoParticipante : cria
 Serializable <|.. Planejamento
 Serializable <|.. Despesa
 Serializable <|.. Participante
 Exception <|-- DadosInvalidosException
-Planejamento ..> DadosInvalidosException : «throws»
-Despesa ..> DadosInvalidosException : «throws»
-Participante ..> DadosInvalidosException : «throws»
-
+Planejamento ..> DadosInvalidosException : lanca
+Despesa ..> DadosInvalidosException : lanca
+Participante ..> DadosInvalidosException : lanca
 
 Persistencia <|.. ArquivoPersistencia
-Persistencia ..> Planejamento : «usa»
+Persistencia ..> Planejamento : usa
 
 PlanejamentoControle "1" --> "1" Planejamento : planejamento
 PlanejamentoControle "1" --> "1" Persistencia : persistencia
 PlanejamentoControle "1" --> "0..*" Ouvinte : ouvintes
-PlanejamentoControle ..> Resposta : «cria»
-PlanejamentoControle ..> DadosInvalidosException : «captura»
-PlanejamentoControle ..> Despesa : «retorna»
-PlanejamentoControle ..> Participante : «retorna»
-PlanejamentoControle ..> ResultadoParticipante : «retorna»
+PlanejamentoControle ..> Resposta : cria
+PlanejamentoControle ..> DadosInvalidosException : captura
+PlanejamentoControle ..> Despesa : retorna
+PlanejamentoControle ..> Participante : retorna
+PlanejamentoControle ..> ResultadoParticipante : retorna
 PlanejamentoController "1" --> "1" Planejamento
 PlanejamentoController "1" --> "1" Persistencia
 
-%% ===================== RELACIONAMENTOS: VISÃO =====================
 JFrame <|-- JanelaPrincipal
 JPanel <|-- PainelParticipantes
 JPanel <|-- PainelDespesas
@@ -303,30 +301,30 @@ JanelaPrincipal "1" *-- "1" PainelParticipantes
 JanelaPrincipal "1" *-- "1" PainelDespesas
 JanelaPrincipal "1" *-- "1" PainelResumo
 JanelaPrincipal "1" *-- "1" PainelPersistencia
-JanelaPrincipal ..> PlanejamentoControle : «recebe»
+JanelaPrincipal ..> PlanejamentoControle : recebe
 PainelParticipantes "1" --> "1" PlanejamentoControle : controle
 PainelDespesas "1" --> "1" PlanejamentoControle : controle
 PainelResumo "1" --> "1" PlanejamentoControle : controle
 PainelPersistencia "1" --> "1" PlanejamentoControle : controle
-PainelParticipantes ..> Ouvinte : «registra (this::atualizar)»
-PainelDespesas ..> Ouvinte : «registra (this::atualizar)»
-PainelResumo ..> Ouvinte : «registra (this::atualizar)»
+PainelParticipantes ..> Ouvinte : registra
+PainelDespesas ..> Ouvinte : registra
+PainelResumo ..> Ouvinte : registra
 PainelParticipantes ..> Apoio
 PainelDespesas ..> Apoio
 PainelResumo ..> Apoio
 PainelPersistencia ..> Apoio
 Apoio ..> Resposta
-PainelDespesas ..> Despesa : «exibe»
-PainelDespesas ..> Participante : «exibe»
-PainelParticipantes ..> Participante : «exibe»
-PainelResumo ..> Despesa : «exibe»
-PainelResumo ..> Participante : «exibe»
-PainelResumo ..> ResultadoParticipante : «exibe»
+PainelDespesas ..> Despesa : exibe
+PainelDespesas ..> Participante : exibe
+PainelParticipantes ..> Participante : exibe
+PainelResumo ..> Despesa : exibe
+PainelResumo ..> Participante : exibe
+PainelResumo ..> ResultadoParticipante : exibe
 
-Main ..> Planejamento : «cria»
-Main ..> ArquivoPersistencia : «cria»
-Main ..> PlanejamentoControle : «cria»
-Main ..> JanelaPrincipal : «cria»
+Main ..> Planejamento : cria
+Main ..> ArquivoPersistencia : cria
+Main ..> PlanejamentoControle : cria
+Main ..> JanelaPrincipal : cria
 ```
 
-**Legenda:** `*` abstrato · `$` estático · `~` visibilidade de pacote. Atributos `serialVersionUID`, classe interna privada `Renderizador` e interface privada `Acao` foram omitidos por serem detalhes internos.
+**Legenda:** `*` abstrato · `$` estático · `~` visibilidade de pacote. Os atributos `serialVersionUID`, a classe interna privada `Renderizador` e a interface privada `Acao` foram omitidos por serem detalhes internos. A classe `PlanejamentoController` é legada e usada apenas nos testes.
