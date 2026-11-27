@@ -4,7 +4,6 @@
 classDiagram
 direction TB
 
-%% ===================== MODELO =====================
 class Planejamento {
   -List~Participante~ participantes
   -List~Despesa~ despesas
@@ -96,12 +95,10 @@ class ResultadoParticipante {
   +getExcesso() BigDecimal
 }
 
-%% ===================== EXCEÇÃO =====================
 class DadosInvalidosException {
   +DadosInvalidosException(String mensagem)
 }
 
-%% ===================== PERSISTÊNCIA =====================
 class Persistencia {
   <<interface>>
   +salvar(Planejamento planejamento) void
@@ -119,7 +116,6 @@ class Serializable {
   <<interface>>
 }
 
-%% ===================== CONTROLE =====================
 class PlanejamentoControle {
   -Planejamento planejamento
   -Persistencia persistencia
@@ -181,7 +177,6 @@ class PlanejamentoController {
   +carregar() void
 }
 
-%% ===================== VISÃO =====================
 class JanelaPrincipal {
   +JanelaPrincipal(PlanejamentoControle controle)
 }
@@ -269,7 +264,6 @@ class Main {
   -iniciar()$ void
 }
 
-%% ===================== RELACIONAMENTOS: MODELO =====================
 Planejamento "1" *-- "0..*" Participante : participantes
 Planejamento "1" *-- "0..*" Despesa : despesas
 Despesa "0..*" --> "1..*" Participante : participantes
@@ -284,11 +278,10 @@ Planejamento ..> DadosInvalidosException : «throws»
 Despesa ..> DadosInvalidosException : «throws»
 Participante ..> DadosInvalidosException : «throws»
 
-%% ===================== RELACIONAMENTOS: PERSISTÊNCIA =====================
+
 Persistencia <|.. ArquivoPersistencia
 Persistencia ..> Planejamento : «usa»
 
-%% ===================== RELACIONAMENTOS: CONTROLE =====================
 PlanejamentoControle "1" --> "1" Planejamento : planejamento
 PlanejamentoControle "1" --> "1" Persistencia : persistencia
 PlanejamentoControle "1" --> "0..*" Ouvinte : ouvintes
@@ -330,7 +323,6 @@ PainelResumo ..> Despesa : «exibe»
 PainelResumo ..> Participante : «exibe»
 PainelResumo ..> ResultadoParticipante : «exibe»
 
-%% ===================== RELACIONAMENTOS: MAIN =====================
 Main ..> Planejamento : «cria»
 Main ..> ArquivoPersistencia : «cria»
 Main ..> PlanejamentoControle : «cria»
