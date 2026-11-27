@@ -1,326 +1,153 @@
+# Diagrama de Classes UML — Cabe no Bolso
+
+O diagrama representa a estrutura das principais classes do sistema Cabe no Bolso, contemplando o modelo de domínio, as operações de negócio, os relacionamentos entre objetos, os mecanismos de abstração e herança e a interface de persistência.
+
 ```mermaid
 classDiagram
 direction TB
 
 class Planejamento {
-  -List~Participante~ participantes
-  -List~Despesa~ despesas
-  +Planejamento()
-  +adicionarParticipante(Participante participante) void
-  +adicionarParticipante(int codigo, String nome, long orcamento) void
-  +alterarNome(int codigo, String nome) void
-  +alterarOrcamento(int codigo, long orcamento) void
-  +excluirParticipante(int codigo) void
-  +adicionarDespesa(Despesa despesa) void
-  +adicionarDespesa(boolean fixa, String descricao, long valor, List~Integer~ codigos) void
-  +editarDespesa(int indice, boolean fixa, String descricao, long valor, List~Integer~ codigos) void
-  +removerDespesa(int indice) void
-  +excluirDespesa(Despesa despesa) void
-  +substituirDespesa(Despesa antiga, Despesa nova) void
-  +getParticipantes() List~Participante~
-  +getDespesas() List~Despesa~
-  +calcularTotalParticipante(int codigo) long
-  +calcularCustoTotal() long
-  +calcularValorExcedido(int codigo) long
-  +estaDentroDoOrcamento(int codigo) boolean
-  +calcularResultados() List~ResultadoParticipante~
-  -validarVinculos(Despesa despesa) void
-  -criarDespesa(boolean fixa, String descricao, long valor, List~Integer~ codigos) Despesa
-  -exigirParticipante(int codigo) Participante
-  -buscarParticipante(int codigo) Participante
+    -List~Participante~ participantes
+    -List~Despesa~ despesas
+    +Planejamento()
+    +adicionarParticipante(participante: Participante) void
+    +adicionarParticipante(codigo: int, nome: String, orcamento: long) void
+    +adicionarDespesa(despesa: Despesa) void
+    +adicionarDespesa(fixa: boolean, descricao: String, valor: long, codigos: List~Integer~) void
+    +editarDespesa(indice: int, fixa: boolean, descricao: String, valor: long, codigos: List~Integer~) void
+    +removerDespesa(indice: int) void
+    +alterarNome(codigo: int, nome: String) void
+    +alterarOrcamento(codigo: int, orcamento: long) void
+    +excluirParticipante(codigo: int) void
+    +calcularResultados() List~ResultadoParticipante~
+    +calcularTotalParticipante(codigo: int) long
+    +calcularCustoTotal() long
+    +calcularValorExcedido(codigo: int) long
+    +estaDentroDoOrcamento(codigo: int) boolean
+    +getParticipantes() List~Participante~
+    +getDespesas() List~Despesa~
 }
 
 class Participante {
-  -int codigo
-  -String nome
-  -long orcamento
-  +Participante(int codigo, String nome, long orcamento)
-  +getCodigo() int
-  +getNome() String
-  +getOrcamento() long
-  +setNome(String nome) void
-  +setOrcamento(long orcamento) void
-  -validarCodigo(int codigo)$ void
-  -validarNome(String nome)$ void
-  -validarOrcamento(long orcamento)$ void
+    -int codigo
+    -String nome
+    -long orcamento
+    +Participante(codigo: int, nome: String, orcamento: long)
+    +getCodigo() int
+    +getNome() String
+    +getOrcamento() long
+    +setNome(nome: String) void
+    +setOrcamento(orcamento: long) void
 }
 
 class Despesa {
-  <<abstract>>
-  -String descricao
-  -long valor
-  -List~Participante~ participantes
-  +getDescricao() String
-  +getValor() long
-  +getValorDecimal() BigDecimal
-  +getParticipantes() List~Participante~
-  +envolveParticipante(int codigo) boolean
-  +getTipo() String*
-  +calcularRateio() Map~Integer,Long~*
-  +calcularRateioDecimal() Map~Integer,BigDecimal~
-  +calcularCustoParticipante(int codigo) long
-  +custoDe(int codigo) BigDecimal
-  +calcularCustoTotal() long
-  +custoTotal() BigDecimal
-  #converterParaCentavos(BigDecimal valorReais)$ long
-  #converterParaReais(long centavos)$ BigDecimal
+    <<abstract>>
+    -String descricao
+    -long valor
+    -List~Participante~ participantes
+    +Despesa(descricao: String, valor: long, participantes: List~Participante~)
+    +getDescricao() String
+    +getValor() long
+    +getValorDecimal() BigDecimal
+    +getParticipantes() List~Participante~
+    +getTipo() String*
+    +calcularRateio() Map~Integer, Long~*
+    +calcularRateioDecimal() Map~Integer, BigDecimal~
+    +calcularCustoParticipante(codigo: int) long
+    +calcularCustoTotal() long
+    +custoTotal() BigDecimal
 }
 
 class DespesaFixa {
-  +getTipo() String
-  +calcularRateio() Map~Integer,Long~
-  +calcularCustoTotal() long
+    +DespesaFixa(descricao: String, valor: long, participantes: List~Participante~)
+    +getTipo() String
+    +calcularRateio() Map~Integer, Long~
+    +calcularCustoTotal() long
 }
 
 class DespesaPorPessoa {
-  +getTipo() String
-  +calcularRateio() Map~Integer,Long~
-  +calcularCustoTotal() long
+    +DespesaPorPessoa(descricao: String, valor: long, participantes: List~Participante~)
+    +getTipo() String
+    +calcularRateio() Map~Integer, Long~
+    +calcularCustoTotal() long
 }
 
 class ResultadoParticipante {
-  <<final>>
-  -int codigo
-  -String nome
-  -long orcamento
-  -long custo
-  +ResultadoParticipante(int codigo, String nome, long orcamento, long custo)
-  +getCodigo() int
-  +getNome() String
-  +getOrcamento() BigDecimal
-  +getCusto() BigDecimal
-  +isDentroDoOrcamento() boolean
-  +getExcesso() BigDecimal
-}
-
-class DadosInvalidosException {
-  +DadosInvalidosException(String mensagem)
-}
-
-class Persistencia {
-  <<interface>>
-  +salvar(Planejamento planejamento) void
-  +carregar() Planejamento
-}
-
-class ArquivoPersistencia {
-  -String caminho
-  +ArquivoPersistencia(String caminho)
-  +salvar(Planejamento planejamento) void
-  +carregar() Planejamento
-}
-
-class Serializable {
-  <<interface>>
+    -int codigo
+    -String nome
+    -long orcamento
+    -long custo
+    +ResultadoParticipante(codigo: int, nome: String, orcamento: long, custo: long)
+    +getCodigo() int
+    +getNome() String
+    +getOrcamento() BigDecimal
+    +getCusto() BigDecimal
+    +isDentroDoOrcamento() boolean
+    +getExcesso() BigDecimal
 }
 
 class PlanejamentoControle {
-  -Planejamento planejamento
-  -Persistencia persistencia
-  -List~Ouvinte~ ouvintes
-  +PlanejamentoControle(Planejamento planejamento, Persistencia persistencia)
-  +adicionarOuvinte(Ouvinte ouvinte) void
-  +cadastrarParticipante(String codigo, String nome, String orcamento) Resposta
-  +alterarNome(String codigo, String novoNome) Resposta
-  +alterarOrcamento(String codigo, String novoOrcamento) Resposta
-  +excluirParticipante(int codigo) Resposta
-  +listarParticipantes() List~Participante~
-  +cadastrarDespesa(String descricao, String valor, boolean fixa, Collection~Integer~ codigos) Resposta
-  +editarDespesa(int indice, String descricao, String valor, boolean fixa, Collection~Integer~ codigos) Resposta
-  +excluirDespesa(int indice) Resposta
-  +listarDespesas() List~Despesa~
-  +custoTotal() BigDecimal
-  +resultados() List~ResultadoParticipante~
-  +salvar() Resposta
-  +carregar() Resposta
-  +novo() Resposta
-  -notificar() void
-  -executar(Acao acao, String mensagemSucesso) Resposta
-  -lerCodigo(String texto)$ int
-  -lerCentavos(String texto, String campo)$ long
+    -Planejamento planejamento
+    -Persistencia persistencia
+    -List~Ouvinte~ ouvintes
+    +PlanejamentoControle(planejamento: Planejamento, persistencia: Persistencia)
+    +cadastrarParticipante(codigo: String, nome: String, orcamento: String) Resposta
+    +alterarNome(codigo: String, novoNome: String) Resposta
+    +alterarOrcamento(codigo: String, novoOrcamento: String) Resposta
+    +excluirParticipante(codigo: int) Resposta
+    +cadastrarDespesa(descricao: String, valor: String, fixa: boolean, codigos: Collection~Integer~) Resposta
+    +editarDespesa(indice: int, descricao: String, valor: String, fixa: boolean, codigos: Collection~Integer~) Resposta
+    +excluirDespesa(indice: int) Resposta
+    +salvar() Resposta
+    +carregar() Resposta
+    +novo() Resposta
+    +custoTotal() BigDecimal
+    +resultados() List~ResultadoParticipante~
 }
 
 class Ouvinte {
-  <<interface>>
-  +planejamentoAlterado() void
+    <<interface>>
+    +planejamentoAlterado() void
 }
 
 class Resposta {
-  <<final>>
-  -boolean sucesso
-  -String mensagem
-  -Resposta(boolean sucesso, String mensagem)
-  +ok(String mensagem)$ Resposta
-  +erro(String mensagem)$ Resposta
-  +isSucesso() boolean
-  +getMensagem() String
+    <<final>>
+    -boolean sucesso
+    -String mensagem
+    -Resposta(sucesso: boolean, mensagem: String)
+    +ok(mensagem: String)$ Resposta
+    +erro(mensagem: String)$ Resposta
+    +isSucesso() boolean
+    +getMensagem() String
 }
 
-class PlanejamentoController {
-  <<legado>>
-  -Planejamento planejamento
-  -Persistencia persistencia
-  +PlanejamentoController(Persistencia persistencia)
-  +getPlanejamento() Planejamento
-  +cadastrarParticipante(int codigo, String nome, long orcamento) void
-  +cadastrarDespesaFixa(String descricao, long valor, List~Participante~ participantes) void
-  +cadastrarDespesaPorPessoa(String descricao, long valor, List~Participante~ participantes) void
-  +alterarNome(int codigo, String nome) void
-  +alterarOrcamento(int codigo, long orcamento) void
-  +editarDespesaFixa(Despesa antiga, String descricao, long valor, List~Participante~ participantes) void
-  +editarDespesaPorPessoa(Despesa antiga, String descricao, long valor, List~Participante~ participantes) void
-  +excluirDespesa(Despesa despesa) void
-  +excluirParticipante(int codigo) void
-  +salvar() void
-  +carregar() void
+class Persistencia {
+    <<interface>>
+    +salvar(planejamento: Planejamento) void
+    +carregar() Planejamento
 }
 
-class JanelaPrincipal {
-  +JanelaPrincipal(PlanejamentoControle controle)
+class ArquivoPersistencia {
+    -String caminho
+    +ArquivoPersistencia(caminho: String)
+    +salvar(planejamento: Planejamento) void
+    +carregar() Planejamento
 }
 
-class PainelParticipantes {
-  -PlanejamentoControle controle
-  -JTextField txtCodigo
-  -JTextField txtNome
-  -JTextField txtOrcamento
-  -DefaultTableModel modelo
-  -JTable tabela
-  -List~Participante~ exibidos
-  -boolean atualizando
-  -criarFormulario() JPanel
-  -criarBotoes() JPanel
-  -adicionar() void
-  -alterarOrcamento() void
-  -alterarNome() void
-  -excluir() void
-  -limparCampos() void
-  -preencherCamposComSelecao() void
-  -atualizar() void
-}
+Planejamento "1" *-- "0..*" Participante : possui
+Planejamento "1" *-- "0..*" Despesa : organiza
 
-class PainelDespesas {
-  -PlanejamentoControle controle
-  -JTextField txtDescricao
-  -JTextField txtValor
-  -JComboBox~String~ cmbTipo
-  -JPanel painelChecks
-  -Map~Integer,JCheckBox~ checks
-  -DefaultTableModel modelo
-  -JTable tabela
-  -boolean atualizando
-  -criarFormulario() JPanel
-  -criarBotoesInferiores() JPanel
-  -adicionar() void
-  -editar() void
-  -excluir() void
-  -marcarTodos(boolean marcar) void
-  -codigosMarcados() List~Integer~
-  -preencherCamposComSelecao() void
-  -atualizar() void
-  -atualizarTabela() void
-  -reconstruirChecks(List~Integer~ marcados) void
-}
+Despesa "0..*" -- "1..*" Participante : envolve
 
-class PainelResumo {
-  -PlanejamentoControle controle
-  -JLabel lblTotal
-  -JLabel lblSituacao
-  -DefaultTableModel modeloDespesas
-  -DefaultTableModel modeloParticipantes
-  -JTable tabelaDespesas
-  -JTable tabelaParticipantes
-  -atualizar() void
-}
+Despesa <|-- DespesaFixa : heranca
+Despesa <|-- DespesaPorPessoa : heranca
 
-class PainelPersistencia {
-  -PlanejamentoControle controle
-  -JTextArea registro
-  -salvar() void
-  -carregar() void
-  -novo() void
-  -registrar(String mensagem) void
-}
+Planejamento ..> ResultadoParticipante : gera resultados
 
-class Apoio {
-  <<utility>>
-  ~moeda(BigDecimal valor)$ String
-  ~moeda(long centavos)$ String
-  ~numero(long centavos)$ String
-  ~numero(BigDecimal valor)$ String
-  ~erro(Component pai, String mensagem)$ void
-  ~info(Component pai, String mensagem)$ void
-  ~confirmar(Component pai, String mensagem)$ boolean
-  ~exibir(Component pai, Resposta resposta)$ boolean
-  ~modeloSomenteLeitura(Object[] colunas)$ DefaultTableModel
-  ~adicionar(JPanel painel, Component componente, int x, int y, int largura, double pesoX)$ void
-}
+PlanejamentoControle "1" --> "1" Planejamento : gerencia
+PlanejamentoControle "1" --> "1" Persistencia : utiliza
+PlanejamentoControle "1" --> "0..*" Ouvinte : notifica
+PlanejamentoControle ..> Resposta : retorna
 
-class Main {
-  -String ARQUIVO_PADRAO$
-  +main(String[] args)$ void
-  -iniciar()$ void
-}
-
-Planejamento "1" *-- "0..*" Participante : participantes
-Planejamento "1" *-- "0..*" Despesa : despesas
-Despesa "0..*" --> "1..*" Participante : participantes
-Despesa <|-- DespesaFixa
-Despesa <|-- DespesaPorPessoa
-Planejamento ..> ResultadoParticipante : cria
-Serializable <|.. Planejamento
-Serializable <|.. Despesa
-Serializable <|.. Participante
-Exception <|-- DadosInvalidosException
-Planejamento ..> DadosInvalidosException : lanca
-Despesa ..> DadosInvalidosException : lanca
-Participante ..> DadosInvalidosException : lanca
-
-Persistencia <|.. ArquivoPersistencia
-Persistencia ..> Planejamento : usa
-
-PlanejamentoControle "1" --> "1" Planejamento : planejamento
-PlanejamentoControle "1" --> "1" Persistencia : persistencia
-PlanejamentoControle "1" --> "0..*" Ouvinte : ouvintes
-PlanejamentoControle ..> Resposta : cria
-PlanejamentoControle ..> DadosInvalidosException : captura
-PlanejamentoControle ..> Despesa : retorna
-PlanejamentoControle ..> Participante : retorna
-PlanejamentoControle ..> ResultadoParticipante : retorna
-PlanejamentoController "1" --> "1" Planejamento
-PlanejamentoController "1" --> "1" Persistencia
-
-JFrame <|-- JanelaPrincipal
-JPanel <|-- PainelParticipantes
-JPanel <|-- PainelDespesas
-JPanel <|-- PainelResumo
-JPanel <|-- PainelPersistencia
-JanelaPrincipal "1" *-- "1" PainelParticipantes
-JanelaPrincipal "1" *-- "1" PainelDespesas
-JanelaPrincipal "1" *-- "1" PainelResumo
-JanelaPrincipal "1" *-- "1" PainelPersistencia
-JanelaPrincipal ..> PlanejamentoControle : recebe
-PainelParticipantes "1" --> "1" PlanejamentoControle : controle
-PainelDespesas "1" --> "1" PlanejamentoControle : controle
-PainelResumo "1" --> "1" PlanejamentoControle : controle
-PainelPersistencia "1" --> "1" PlanejamentoControle : controle
-PainelParticipantes ..> Ouvinte : registra
-PainelDespesas ..> Ouvinte : registra
-PainelResumo ..> Ouvinte : registra
-PainelParticipantes ..> Apoio
-PainelDespesas ..> Apoio
-PainelResumo ..> Apoio
-PainelPersistencia ..> Apoio
-Apoio ..> Resposta
-PainelDespesas ..> Despesa : exibe
-PainelDespesas ..> Participante : exibe
-PainelParticipantes ..> Participante : exibe
-PainelResumo ..> Despesa : exibe
-PainelResumo ..> Participante : exibe
-PainelResumo ..> ResultadoParticipante : exibe
-
-Main ..> Planejamento : cria
-Main ..> ArquivoPersistencia : cria
-Main ..> PlanejamentoControle : cria
-Main ..> JanelaPrincipal : cria
+Persistencia <|.. ArquivoPersistencia : implementa
 ```
