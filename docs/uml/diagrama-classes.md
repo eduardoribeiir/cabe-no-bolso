@@ -1,5 +1,3 @@
-# Diagrama de classes — Cabe no bolso
-
 ```mermaid
 classDiagram
 direction TB
@@ -326,5 +324,3 @@ Main ..> ArquivoPersistencia : cria
 Main ..> PlanejamentoControle : cria
 Main ..> JanelaPrincipal : cria
 ```
-
-**Legenda:** `*` abstrato · `$` estático · `~` visibilidade de pacote. Os atributos `serialVersionUID`, a classe interna privada `Renderizador` e a interface privada `Acao` foram omitidos por serem detalhes internos. A classe `PlanejamentoController` é legada e usada apenas nos testes.
